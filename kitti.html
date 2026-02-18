@@ -31,6 +31,32 @@
     </style>
 </head>
 <body>
-    Kitti sensor fusion experiences
+    <p>Welcome to the Kitti Sensor Fusion Experiences page. Below you can watch the video showcasing the sensor fusion techniques.</p>
+    <div style="max-width: 800px; margin: 20px auto; padding: 0 20px;">
+        <h2>Sensor Details</h2>
+        <ul>
+            <li><strong>RGB:</strong> - RGB camera: 15 Hz (15 fps)</li>
+            <li><strong>LIDAR:</strong> - Velodyne LiDAR: 10Hz</li>
+            <li><strong>GPS/IMU:</strong> OXTS GPS navigation system: 100Hz</li>
+            
+            <li><strong>Fusion:</strong> Combined sensor data for robust object detection and tracking.
+            <br>The main steps are summarized as:
+            <p> - Calibrate sensors to establish coordinate system relationships </p>
+            <p> - Detect objects in the camera images (Detection) </p>
+            <p> - Project 3D LiDAR point clouds to 2D Image space (Fusion) </p>
+            <p> - Associate LiDAR depth with each Detected object (Association to get Depth) </p>
+
+            Detection in 3D as opposed to 2D is much more useful to an autonomous vehicle since 3D detection allows 
+            the system know where objects are physically located in the world.</li>
+            
+            
+        </ul>
+    </div>
+    <h1>Kitti sensor fusion experiences</h1>
+    <div class="video-container">
+        <video controls>
+            <source src="lidar_frame_stack.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
 </body>
 </html>

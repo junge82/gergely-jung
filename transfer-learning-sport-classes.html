@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Transfer Learning on Sport Classes</title>
+    <style>
+        body {
+            background: #181818;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px 0;
+        }
+        .video-container {
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+            border-radius: 8px;
+            overflow: hidden;
+            background: #222;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #000;
+        }
+    </style>
+</head>
+<body>    
+    <h2>Transfer Learning Phases</h2>
+    <ul>
+        <li>1st phase: Try out Resnet-18 pretrained based model on a test image</li>
+        <li>2nd phase: Fine-Tuning base model for specific task on a custom dataset</li>
+        <li>Data Augmentation for training dataset</li>
+        <li>ImageNet classes (1000)</li>
+        <li>Custom dataset contains 3 classes, only 1 new class, Source from: image.cv</li>
+        <li>Freezing Resnet-18 layers except FC layer</li>
+        <li>Training on FC with validation step</li>
+        <li>Pytorch Lightning with early stopping and checkpoint saving support</li>
+        <li>Confusion matrix and report</li>
+    </ul>
+</body>
+</html>
