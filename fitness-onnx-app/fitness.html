@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ResNet18 Fitness Classifier - GitHub Pages</title>
+        <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.18.0/dist/ort.min.js"></script>
+        <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .classes {
+            text-align: center;
+            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        
+        .upload-area {
+            border: 3px dashed #4ecdc4;
+            border-radius: 15px;
+            padding: 50px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+        }
+        .upload-area:hover { 
+            border-color: #45b7d1; 
+            background: #e8f4f8;
+            transform: translateY(-5px);
+        }
+        .upload-area.dragover { 
+            border-color: #ff6b6b; 
+            background: #fff5f5;
+            transform: scale(1.02);
+        }
+        .upload-icon { font-size: 60px; margin-bottom: 20px; }
+        
+        #preview { 
+            max-width: 100%; 
+            max-height: 500px; 
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            display: none;
+            margin: 30px auto;
+        }
+        
+        #classifyBtn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-size: 1.4em;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #classifyBtn:hover:not(:disabled) { 
+            transform: translateY(-3px); 
+            box-shadow: 0 15px 30px rgba(255,107,107,0.4);
+        }
+        #classifyBtn:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed; 
+            background: #ccc;
+        }
+        
+        .spinner {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+            font-size: 1.2em;
+            color: #ff6b6b;
+        }
+        .spinner.active { display: block; }
+        
+        #results {
+            margin-top: 40px;
+        }
+        .prediction {
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            padding: 25px;
+            margin: 15px 0;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.3em;
+            transition: all 0.3s ease;
+        }
+        .prediction:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .pred-label { 
+            font-weight: 700; 
+            font-size: 1.5em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .pred-confidence { 
+            font-size: 2em; 
+            font-weight: bold; 
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .status { 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin: 20px 0; 
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        
+        @media (max-width: 768px) {
+            .container { padding: 20px; }
+            h1 { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏋️ ResNet18 Fitness Classifier</h1>
+        <div class="classes">🧘 yoga | 🤸 balance_beam | 🏋️ barbell</div>
+        
+        <div class="upload-area" id="modelUpload">
+            <div class="upload-icon">🧠</div>
+            <div><strong>Upload resnet18_finetuned.onnx</strong></div>
+            <div>Drop your trained model here</div>
+            <input type="file" id="modelInput" accept=".onnx" style="display: none;">
+        </div>
+        
+        <div class="upload-area" id="imageUpload">
+            <div class="upload-icon">📸</div>
+            <div><strong>Upload Fitness Image</strong></div>
+            <div>JPG/PNG of yoga, balance beam, or barbell</div>
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+        </div>
+        
+        <img id="preview" />
+        <div id="status"></div>
+        
+        <button id="classifyBtn" disabled>🔍 CLASSIFY IMAGE</button>
+        
+        <div class="spinner" id="spinner">
+            <div>⚡ Running ResNet18 inference...</div>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.18.0/dist/ort.min.js"></script>
+    <script>
+        // Your 3 fitness classes
+        const FITNESS_CLASSES = ['balance_beam', 'barbell', 'yoga'];
+
+        class ResNet18FitnessClassifier {
+            constructor() {
+                this.session = null;
+                this.imageData = null;
+                this.inputName = 'input';  // Common ResNet input name
+                this.outputName = 'output'; // Common ResNet output name
+                this.initElements();
+                this.bindEvents();
+            }
+
+            initElements() {
+                this.modelUpload = document.getElementById('modelUpload');
+                this.imageUpload = document.getElementById('imageUpload');
+                this.modelInput = document.getElementById('modelInput');
+                this.imageInput = document.getElementById('imageInput');
+                this.preview = document.getElementById('preview');
+                this.classifyBtn = document.getElementById('classifyBtn');
+                this.spinner = document.getElementById('spinner');
+                this.status = document.getElementById('status');
+                this.results = document.getElementById('results');
+            }
+
+            bindEvents() {
+                // Model upload
+                this.modelUpload.addEventListener('click', () => this.modelInput.click());
+                this.modelInput.addEventListener('change', (e) => this.loadModel(e.target.files[0]));
+                
+                // Image upload
+                this.imageUpload.addEventListener('click', () => this.imageInput.click());
+                this.imageInput.addEventListener('change', (e) => this.handleImage(e.target.files[0]));
+                
+                // Drag & drop for both areas
+                [this.modelUpload, this.imageUpload].forEach(area => {
+                    area.addEventListener('dragover', this.handleDragOver);
+                    area.addEventListener('dragenter', this.handleDragOver);
+                    area.addEventListener('dragleave', this.handleDragLeave);
+                    area.addEventListener('drop', (e) => this.handleDrop(e, area));
+                });
+                
+                this.classifyBtn.addEventListener('click', () => this.classify());
+            }
+
+            handleDragOver(e) {
+                e.preventDefault();
+                e.currentTarget.classList.add('dragover');
+            }
+
+            handleDragLeave(e) {
+                e.currentTarget.classList.remove('dragover');
+            }
+
+            handleDrop(e, area) {
+                e.preventDefault();
+                e.currentTarget.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    if (file.name === 'resnet18_finetuned.onnx' || file.name.endsWith('.onnx')) {
+                        this.loadModel(file);
+                    } else if (file.type.startsWith('image/')) {
+                        this.handleImage(file);
+                    }
+                }
+            }
+
+            async loadModel(file) {
+                this.showStatus('Loading ResNet18_finetuned model...', 'info');
+                this.spinner.classList.add('active');
+                
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const modelData = new Uint8Array(arrayBuffer);
+                    
+                    this.session = await ort.InferenceSession.create(modelData, {
+                        executionProviders: ['wasm']
+                    });
+                    
+                    // Get actual input/output names from model
+                    this.inputName = this.session.inputNames[0];
+                    this.outputName = this.session.outputNames[0];
+                    
+                    this.showStatus(`✅ ResNet18_finetuned loaded! (${(arrayBuffer.byteLength/1024/1024).toFixed(1)}MB)`, 'success');
+                    this.classifyBtn.disabled = !this.imageData;
+                    
+                } catch (error) {
+                    this.showStatus(`❌ Failed to load model: ${error.message}`, 'error');
+                } finally {
+                    this.spinner.classList.remove('active');
+                }
+            }
+
+            handleImage(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        // Display preview
+                        this.preview.src = e.target.result;
+                        this.preview.style.display = 'block';
+                        
+                        // Preprocess for ResNet18 (224x224, normalized ImageNet stats)
+                        this.imageData = this.preprocessResNetImage(img);
+                        
+                        this.classifyBtn.disabled = !this.session;
+                        this.showStatus('✅ Image processed - Ready to classify!', 'success');
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            preprocessResNetImage(img) {
+                // ResNet18 expects: [1, 3, 224, 224] with ImageNet normalization
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = canvas.height = 224;
+                
+                // Resize and center crop
+                ctx.drawImage(img, 0, 0, 224, 224);
+                const imageData = ctx.getImageData(0, 0, 224, 224);
+                
+                // CHW format with ImageNet normalization [mean=[0.485,0.456,0.406], std=[0.229,0.224,0.225]]
+                const data = new Float32Array(3 * 224 * 224);
+                const MEANS = [0.485, 0.456, 0.406];
+                const STDS = [0.229, 0.224, 0.225];
+                
+                for (let i = 0; i < imageData.data.length; i += 4) {
+                    const x = (i / 4) | 0;
+                    const r = imageData.data[i] / 255;
+                    const g = imageData.data[i + 1] / 255;
+                    const b = imageData.data[i + 2] / 255;
+                    
+                    data[0 * 224 * 224 + x] = (r - MEANS[0]) / STDS[0];  // R
+                    data[1 * 224 * 224 + x] = (g - MEANS[1]) / STDS[1];  // G
+                    data[2 * 224 * 224 + x] = (b - MEANS[2]) / STDS[2];  // B
+                }
+                return data;
+            }
+
+            async classify() {
+                if (!this.session || !this.imageData) return;
+                
+                this.classifyBtn.disabled = true;
+                this.spinner.classList.add('active');
+                this.results.innerHTML = '';
+                
+                try {
+                    const tensor = new ort.Tensor('float32', this.imageData, [1, 3, 224, 224]);
+                    const feeds = { [this.inputName]: tensor };
+                    const results = await this.session.run(feeds);
+                    const scores = results[this.outputName].data;
+                    
+                    // Get predictions for 3 fitness classes
+                    const predictions = FITNESS_CLASSES.map((className, i) => ({
+                        label: className,
+                        confidence: Math.max(0, scores[i])  // Ensure non-negative
+                    })).sort((a, b) => b.confidence - a.confidence);
+                    
+                    predictions.forEach((pred, i) => {
+                        const div = document.createElement('div');
+                        div.className = 'prediction';
+                        div.innerHTML = `
+                            <div class="pred-label">${pred.label.toUpperCase()}</div>
+                            <div class="pred-confidence">${(pred.confidence * 100).toFixed(1)}%</div>
+                        `;
+                        this.results.appendChild(div);
+                    });
+                    
+                } catch (error) {
+                    this.showStatus(`❌ Classification error: ${error.message}`, 'error');
+                } finally {
+                    this.classifyBtn.disabled = false;
+                    this.spinner.classList.remove('active');
+                }
+            }
+
+            showStatus(message, type) {
+                this.status.textContent = message;
+                this.status.className = `status ${type}`;
+            }
+        }
+
+        // Start the classifier
+        new ResNet18FitnessClassifier();
+    </script>
+</body>
+</html>
