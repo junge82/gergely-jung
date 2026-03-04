@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Bot with LangChain</title>
+    <style>
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1a2e;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        header {
+            max-width: 1000px;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0 0 16px 0;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .subtitle {
+            font-size: 1.125rem;
+            color: #b0b0b0;
+            margin: 0;
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: #16213e;
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .content-section h2 {
+            font-size: 1.75rem;
+            margin: 0 0 20px 0;
+            color: #fff;
+            border-bottom: 2px solid #0f3460;
+            padding-bottom: 12px;
+        }
+
+        /* Lists */
+        .features-list,
+        .tech-list {
+            margin: 0;
+            padding-left: 24px;
+        }
+
+        .features-list li,
+        .tech-list li {
+            margin-bottom: 16px;
+            color: #e0e0e0;
+        }
+
+        .features-list li:last-child,
+        .tech-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .features-list strong,
+        .tech-list strong {
+            color: #4a9eff;
+            font-weight: 600;
+        }
+
+        /* Gradio Interface Container */
+        .gradio-container {
+            background: #0f3460;
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            border: 2px solid #16213e;
+        }
+
+        .gradio-container h2 {
+            font-size: 1.75rem;
+            margin: 0 0 20px 0;
+            color: #fff;
+            border-bottom: 2px solid #1a1a2e;
+            padding-bottom: 12px;
+        }
+
+        /* Gradio Iframe */
+        .gradio-iframe-wrapper {
+            position: relative;
+            width: 100%;
+            min-height: 600px;
+            background: #1a1a2e;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #2a2a3e;
+        }
+
+        .gradio-iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            display: block;
+        }
+
+        .gradio-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 600px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .gradio-placeholder h3 {
+            color: #4a9eff;
+            margin: 0 0 16px 0;
+            font-size: 1.5rem;
+        }
+
+        .gradio-placeholder p {
+            color: #b0b0b0;
+            margin: 0 0 24px 0;
+            max-width: 600px;
+        }
+
+        .gradio-placeholder code {
+            background: #1a1a2e;
+            padding: 16px;
+            border-radius: 4px;
+            display: block;
+            color: #4a9eff;
+            font-family: 'Courier New', monospace;
+            margin-top: 16px;
+            text-align: left;
+        }
+
+        /* Architecture Diagram */
+        .architecture {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            border-left: 4px solid #4a9eff;
+        }
+
+        .architecture-diagram {
+            background: #1a1a2e;
+            padding: 24px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #e0e0e0;
+            overflow-x: auto;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #1a1a2e;
+            padding: 16px;
+            border-radius: 4px;
+            margin: 16px 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            color: #4a9eff;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer {
+            max-width: 1000px;
+            width: 100%;
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid #0f3460;
+        }
+
+        .back-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #4a9eff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: #357abd;
+        }
+
+        .back-link:focus {
+            outline: 2px solid #4a9eff;
+            outline-offset: 2px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 16px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .content-section,
+            .gradio-container {
+                padding: 24px 20px;
+            }
+
+            .content-section h2,
+            .gradio-container h2 {
+                font-size: 1.5rem;
+            }
+
+            .gradio-iframe {
+                height: 500px;
+            }
+
+            .gradio-placeholder {
+                min-height: 500px;
+                padding: 24px;
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Project Overview Section -->
+    <header role="banner">
+        <h1>QA Bot with LangChain</h1>
+        <p class="subtitle">Retrieval-Augmented Generation (RAG) chatbot for intelligent document Q&A</p>
+    </header>
+
+    <!-- Main Content -->
+    <main role="main">
+        <!-- Gradio Interface Section 
+        <section class="gradio-container" aria-labelledby="interface-heading">
+            <h2 id="interface-heading">Interactive Demo</h2>
+            <div class="gradio-iframe-wrapper">-->
+                <!-- Replace the src URL with your actual Gradio app URL -->
+                <!-- Example: <iframe class="gradio-iframe" src="http://localhost:7860" title="QA Bot Gradio Interface"></iframe> -->
+                <!--
+                <div class="gradio-placeholder">
+                    <h3>🚀 Gradio Interface</h3>
+                    <p>To enable the interactive demo, deploy your Gradio app and update the iframe source below:</p>
+                    <div class="code-block">
+                        <code><iframe class="gradio-iframe" src="YOUR_GRADIO_URL" title="QA Bot Interface"></iframe></code>
+                    </div>
+                    <p style="margin-top: 24px; color: #888;">
+                        <strong>Local Development:</strong> Run your Gradio app with <code style="background: #1a1a2e; padding: 4px 8px; border-radius: 4px;">python app.py</code> and use <code style="background: #1a1a2e; padding: 4px 8px; border-radius: 4px;">http://localhost:7860</code>
+                    </p>
+                </div>
+            </div>
+        </section>
+    -->
+
+        <!-- Features Section -->
+        <section class="content-section" aria-labelledby="features-heading">
+            <h2 id="features-heading">Key Features</h2>
+            <ul class="features-list">
+                <li>
+                    <strong>Document Upload:</strong> Support for PDF, DOCX, TXT files with automatic text extraction
+                </li>
+                <li>
+                    <strong>Intelligent Chunking:</strong> Smart document splitting with overlap for context preservation
+                </li>
+                <li>
+                    <strong>Vector Embeddings:</strong> Semantic search using state-of-the-art embedding models
+                </li>
+                <li>
+                    <strong>RAG Pipeline:</strong> Retrieval-Augmented Generation for accurate, context-aware answers
+                </li>
+                <li>
+                    <strong>Source Citations:</strong> Answers include references to source documents and page numbers
+                </li>
+                <li>
+                    <strong>Conversation Memory:</strong> Maintains context across multiple questions
+                </li>
+                <li>
+                    <strong>Gradio Interface:</strong> User-friendly web interface for easy interaction
+                </li>
+            </ul>
+        </section>
+
+        <!-- Architecture Section -->
+        <section class="content-section architecture" aria-labelledby="architecture-heading">
+            <h2 id="architecture-heading">System Architecture</h2>
+            <div class="architecture-diagram">
+                <pre>
+┌─────────────────────────────────────────────────────────────┐
+│                     Document Processing                      │
+│  ┌──────────┐    ┌──────────┐    ┌─────────────────────┐  │
+│  │ PDF/DOCX │───▶│  Loader  │───▶│  Text Splitter      │  │
+│  │   TXT    │    │          │    │  (Chunking)         │  │
+│  └──────────┘    └──────────┘    └─────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Vector Store (FAISS/Chroma)              │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  Embeddings (OpenAI / HuggingFace / Sentence-BERT)  │  │
+│  └──────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│                      RAG Pipeline                            │
+│  ┌──────────┐    ┌──────────┐    ┌─────────────────────┐  │
+│  │  Query   │───▶│ Retriever│───▶│  LLM (GPT-4/Llama)  │  │
+│  │          │    │ (Top-K)  │    │  + Context          │  │
+│  └──────────┘    └──────────┘    └─────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Gradio Interface                          │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │  Chat UI │ File Upload │ Settings │ History          │  │
+│  └──────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+                </pre>
+            </div>
+        </section>
+
+        <!-- Technology Stack Section -->
+        <section class="content-section" aria-labelledby="tech-heading">
+            <h2 id="tech-heading">Technology Stack</h2>
+            <ul class="tech-list">
+                <li><strong>LangChain:</strong> Framework for building LLM applications with RAG capabilities</li>
+                <li><strong>Vector Database:</strong> FAISS or ChromaDB for efficient similarity search</li>
+                <li><strong>Embeddings:</strong> OpenAI Ada-002, HuggingFace, or Sentence-Transformers</li>
+                <li><strong>LLM:</strong> GPT-4, GPT-3.5-Turbo, or open-source models (Llama 2, Mistral)</li>
+                <li><strong>Document Loaders:</strong> PyPDF2, python-docx, UnstructuredIO</li>
+                <li><strong>Gradio:</strong> Interactive web interface with file upload and chat components</li>
+                <li><strong>Python:</strong> Core implementation language with async support</li>
+            </ul>
+        </section>
+
+        <!-- Implementation Details Section -->
+        <section class="content-section" aria-labelledby="implementation-heading">
+            <h2 id="implementation-heading">Implementation Highlights</h2>
+            <ul class="features-list">
+                <li>
+                    <strong>Chunking Strategy:</strong> RecursiveCharacterTextSplitter with 1000 token chunks and 200 token overlap
+                </li>
+                <li>
+                    <strong>Retrieval:</strong> Top-K similarity search (K=4) with MMR (Maximal Marginal Relevance) for diversity
+                </li>
+                <li>
+                    <strong>Prompt Engineering:</strong> Custom system prompts for accurate, concise answers with source attribution
+                </li>
+                <li>
+                    <strong>Error Handling:</strong> Graceful fallbacks for API failures, document parsing errors, and edge cases
+                </li>
+                <li>
+                    <strong>Performance:</strong> Caching mechanisms for embeddings and responses to reduce latency
+                </li>
+                <li>
+                    <strong>Security:</strong> Input sanitization, rate limiting, and API key management
+                </li>
+            </ul>
+        </section>
+
+        <!-- Use Cases Section -->
+        <section class="content-section" aria-labelledby="usecases-heading">
+            <h2 id="usecases-heading">Use Cases</h2>
+            <ul class="features-list">
+                <li><strong>Research:</strong> Query academic papers, technical documentation, and research reports</li>
+                <li><strong>Legal:</strong> Search through contracts, legal documents, and case files</li>
+                <li><strong>Customer Support:</strong> Answer questions from product manuals and knowledge bases</li>
+                <li><strong>Education:</strong> Interactive learning from textbooks and course materials</li>
+                <li><strong>Business Intelligence:</strong> Extract insights from reports, presentations, and memos</li>
+            </ul>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer role="contentinfo">
+        <a href="index.html" class="back-link" aria-label="Return to portfolio homepage">← Back to Portfolio</a>
+    </footer>
+</body>
+</html>
