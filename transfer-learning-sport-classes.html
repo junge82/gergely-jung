@@ -4,44 +4,243 @@
     <meta charset="UTF-8">
     <title>Transfer Learning on Sport Classes</title>
     <style>
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background: #181818;
+            background: #355a92;
             color: #fff;
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             margin: 0;
-            padding: 40px 0;
+            padding: 40px 20px;
+            line-height: 1.6;
         }
+
+        /* Header Styles */
+        header {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0 0 16px 0;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .subtitle {
+            font-size: 1.125rem;
+            color: #b0b0b0;
+            margin: 0;
+        }
+
+        /* Main Content */
+        main {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: #222;
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .content-section h2 {
+            font-size: 1.75rem;
+            margin: 0 0 20px 0;
+            color: #fff;
+            border-bottom: 2px solid #444;
+            padding-bottom: 12px;
+        }
+
+        /* Lists */
+        .steps-list,
+        .phases-list {
+            margin: 0;
+            padding-left: 24px;
+        }
+
+        .steps-list li,
+        .phases-list li {
+            margin-bottom: 16px;
+            color: #e0e0e0;
+        }
+
+        .steps-list li:last-child,
+        .phases-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .steps-list strong,
+        .phases-list strong {
+            color: #4a9eff;
+            font-weight: 600;
+        }
+
+        /* Results Section */
+        .results {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2a2a2a 100%);
+            border-left: 4px solid #4a9eff;
+        }
+
+        .result-summary {
+            font-size: 1.125rem;
+            margin: 0;
+            color: #e0e0e0;
+            font-weight: 500;
+        }
+
+        /* Video Container */
         .video-container {
             max-width: 800px;
             width: 100%;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
             border-radius: 8px;
             overflow: hidden;
             background: #222;
+            margin-bottom: 24px;
         }
+
         video {
             width: 100%;
             height: auto;
             display: block;
             background: #000;
         }
+
+        /* Footer */
+        footer {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid #333;
+        }
+
+        .file-path {
+            font-size: 0.875rem;
+            color: #666;
+            margin: 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 16px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .content-section {
+                padding: 24px 20px;
+            }
+
+            .content-section h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        a:focus,
+        button:focus {
+            outline: 2px solid #4a9eff;
+            outline-offset: 2px;
+        }
     </style>
 </head>
-<body>    
-    <h2>Transfer Learning Phases</h2>
-    <ul>
-        <li>1st phase: Try out Resnet-18 pretrained based model on a test image</li>
-        <li>2nd phase: Fine-Tuning base model for specific task on a custom dataset</li>
-        <li>Data Augmentation for training dataset</li>
-        <li>ImageNet classes (1000)</li>
-        <li>Custom dataset contains 3 classes, only 1 new class, Source from: image.cv</li>
-        <li>Freezing Resnet-18 layers except FC layer</li>
-        <li>Training on FC with validation step</li>
-        <li>Pytorch Lightning with early stopping and checkpoint saving support</li>
-        <li>Confusion matrix and report</li>
-    </ul>
+<body>
+    <!-- Project Overview Section -->
+    <header role="banner">
+        <h1>ResNet18 Transfer Learning for Custom Image Classification</h1>
+        <p class="subtitle">End-to-end transfer learning demonstration using ResNet18 on a custom image dataset</p>
+    </header>
+
+    <!-- Main Content -->
+    <main role="main">
+        <!-- Key Steps Section -->
+        <section class="content-section" aria-labelledby="key-steps-heading">
+            <h2 id="key-steps-heading">Key Steps</h2>
+            <ol class="steps-list">
+                <li>
+                    <strong>Data Preparation:</strong> Loaded custom dataset, split into train/val/test (80/10/10), applied augmentation transforms
+                </li>
+                <li>
+                    <strong>Model Selection:</strong> Evaluate ResNet-18 pretrained model on test images
+                </li>
+                <li>
+                    <strong>Data Balancing:</strong> Applied SMOTE to handle class imbalance in training data
+                </li>
+                <li>
+                    <strong>Model Training:</strong> Fine-tuned ResNet18 using PyTorch Lightning with frozen backbone, Lasso (L1) regularization, SGD optimizer with momentum and early stopping
+                </li>
+                <li>
+                    <strong>Evaluation:</strong> Computed per-class accuracy, confusion matrix, ROC curves, and Precision-Recall curves
+                </li>
+                <li>
+                    <strong>Export:</strong> Converted model to ONNX format for cross-platform deployment
+                </li>
+                <li>
+                    <strong>Inference:</strong> Tested ONNX model on sample images with accessibility features (text-to-speech [pytts3])
+                </li>
+            </ol>
+        </section>
+
+        <!-- Results Section -->
+        <section class="content-section results" aria-labelledby="results-heading">
+            <h2 id="results-heading">Results</h2>
+            <p class="result-summary">
+                High per-class accuracy with strong precision-recall trade-offs. Model ready for production deployment.
+            </p>
+        </section>
+
+        <!-- Transfer Learning Phases Section -->
+        <section class="content-section" aria-labelledby="phases-heading">
+            <h2 id="phases-heading">Transfer Learning Phases</h2>
+            <ul class="phases-list">
+                <li><strong>Phase 1:</strong> Evaluate ResNet-18 pretrained model on test images</li>
+                <li><strong>Phase 2:</strong> Fine-tune base model for specific task on custom dataset</li>
+                <li><strong>Data Augmentation:</strong> Applied to training dataset for improved generalization</li>
+                <li><strong>Base Model:</strong> ResNet-18 pretrained on ImageNet (1000 classes)</li>
+                <li><strong>Custom Dataset:</strong> 3 classes with 1 new class (Source: image.cv)</li>
+                <li><strong>Architecture:</strong> Frozen ResNet-18 layers except final fully connected layer</li>
+                <li><strong>Training:</strong> Fine-tuned FC layer with validation step</li>
+                <li><strong>Framework:</strong> PyTorch Lightning with early stopping and checkpoint saving</li>
+                <li><strong>Evaluation Metrics:</strong> Confusion matrix and classification report</li>
+            </ul>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer role="contentinfo">
+        <p class="file-path" aria-label="File location">Path: transfer-learning-sport-classes.html</p>
+    </footer>
 </body>
 </html>
