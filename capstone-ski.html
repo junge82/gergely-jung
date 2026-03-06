@@ -73,6 +73,12 @@
 </head>
 <body>
     <a href="index.html" class="back-button" aria-label="Back to portfolio">← Back to Portfolio</a>
+    <h1>OpenCV Perspective Transformation</h1>
+        <!-- ipm_matrix = cv.getPerspectiveTransform(src_points, dst_points)
+                Ipm_matrix [3x3] describes how to map coordinates from the source points to the destination points
+                bev_img = cv.warpPerspective(image, ipm_matrix, output_size)
+                applies the calculated perspective transformation to the input image using the cv.warpPerspective() function -->
+        
 
     <h1>Video Player</h1>
     <div class="video-container">
