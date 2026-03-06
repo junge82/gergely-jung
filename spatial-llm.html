@@ -4,77 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spatial LM Behavior</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
-            line-height: 1.6;
-            color: #333;
-        }
-        h1 {
-            color: #2c3e50;
-        }
-        .section {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #ecf0f1;
-            border-left: 4px solid #3498db;
-        }
-        .back-button {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 12px 24px;
-            background: #2563eb;
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
-        }
-        .back-button:hover {
-            background: #1d4ed8;
-            transform: translateX(-5px);
-            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
-        }
-        .back-button:focus {
-            outline: 3px solid #2563eb;
-            outline-offset: 3px;
-        }
-
-        .back-link {
-            display: inline-block;
-            padding: 12px 24px;
-            background: #4a9eff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: 600;
-            transition: background 0.3s ease;
-        }
-
-        .back-link:hover {
-            background: #357abd;
-        }
-
-        .back-link:focus {
-            outline: 2px solid #4a9eff;
-            outline-offset: 2px;
-        }
-    </style>
+    <link rel="stylesheet" href="portfolio-style.css">
 </head>
 <body>
     <a href="index.html" class="back-button" aria-label="Back to portfolio">← Back to Portfolio</a>
-    <h1>Spatial Language Model (LM) Behavior</h1>
+    <header>
+        <h1>Spatial Language Model (LM) Behavior</h1>
+        <p class="subtitle">3D Scene Understanding with Point Cloud Processing</p>
+    </header>
     
-    <div class="section">
+    <main>
+    <section class="content-section">
         <h2>Overview</h2>
         <p>Spatial Language Models process and understand spatial relationships and geometric information in text and visual contexts.</p>
-    </div>
+    </section>
 
-    <div class="section">
+    <section class="content-section">
         <h2>Key Behaviors</h2>
         <ul>
             <li>SpatialLM is a 3D large language model designed to process 3D point cloud data and generate structured 3D scene 
@@ -95,13 +40,14 @@
             <li><strong>Navigation:</strong> Processes directional instructions and path planning</li>
             <li><strong>Scene Understanding:</strong> Interprets complex spatial layouts and compositions</li>
         </ul>
-    </div>
+    </section>
 
-    <div class="section">
+    <section class="content-section">
         <h2>Applications</h2>
         <p>Spatial LMs are used in robotics, autonomous navigation, 3D scene understanding, and embodied AI tasks.</p>
-    </div>
-    <!-- Footer -->
+    </section>
+    </main>
+    
     <footer role="contentinfo">
         <a href="index.html" class="back-link" aria-label="Return to portfolio homepage">← Back to Portfolio</a>
     </footer>

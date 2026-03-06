@@ -2,151 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Kitti Sensor Fusion Experiences</title>
-    <style>
-        body {
-            background: #181818;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 40px 0;
-        }
-        .video-container {
-            max-width: 800px;
-            width: 100%;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-            border-radius: 8px;
-            overflow: hidden;
-            background: #222;
-        }
-        video {
-            width: 100%;
-            height: auto;
-            display: block;
-            background: #000;
-        }
-        .back-button {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 12px 24px;
-            background: #2563eb;
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
-        }
-        .back-button:hover {
-            background: #1d4ed8;
-            transform: translateX(-5px);
-            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
-        }
-        .back-button:focus {
-            outline: 3px solid #2563eb;
-            outline-offset: 3px;
-        }
-        .fusion-explanation {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #222;
-            border-radius: 8px;
-        }
-
-        .fusion-explanation h2 {
-            color: #4CAF50;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #4CAF50;
-            padding-bottom: 10px;
-        }
-
-        .fusion-types {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .fusion-type {
-            background: #2a2a2a;
-            padding: 15px;
-            border-radius: 6px;
-            border-left: 4px solid #666;
-        }
-
-        .fusion-type.highlight {
-            border-left-color: #4CAF50;
-            background: #2d3a2d;
-        }
-
-        .fusion-type h3 {
-            color: #4CAF50;
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-
-        .fusion-type p {
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-
-        .fusion-type ol {
-            margin: 10px 0;
-            padding-left: 20px;
-            line-height: 1.8;
-        }
-
-        .fusion-type ol li {
-            margin: 8px 0;
-        }
-
-        .note {
-            background: #3a3a2a;
-            padding: 10px;
-            border-radius: 4px;
-            border-left: 3px solid #FFC107;
-            margin-top: 15px;
-            font-size: 0.95em;
-        }
-
-        .note strong {
-            color: #FFC107;
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .fusion-explanation {
-                margin: 10px;
-                padding: 15px;
-            }
-        }
-        .back-link {
-            display: inline-block;
-            padding: 12px 24px;
-            background: #4a9eff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: 600;
-            transition: background 0.3s ease;
-        }
-
-        .back-link:hover {
-            background: #357abd;
-        }
-
-        .back-link:focus {
-            outline: 2px solid #4a9eff;
-            outline-offset: 2px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KITTI Sensor Fusion</title>
+    <link rel="stylesheet" href="portfolio-style.css">
 </head>
 <body>
     <a href="index.html" class="back-button" aria-label="Back to portfolio">← Back to Portfolio</a>
-<section class="fusion-explanation" aria-labelledby="fusion-heading">
+    <header>
+        <h1>KITTI Sensor Fusion</h1>
+        <p class="subtitle">Multi-Modal Sensor Integration for 3D Object Detection</p>
+    </header>
+    
+    <main>
+<section class="content-section fusion-explanation" aria-labelledby="fusion-heading">
     <h2 id="fusion-heading">Sensor Fusion Approaches</h2>
     <div class="fusion-types">
         <div class="fusion-type">
@@ -181,37 +49,37 @@
         </div>
     </div>
 </section>
-<section class="fusion-explanation" aria-labelledby="fusion-heading"> 
-<body>    
-    <p>Welcome to the Kitti Sensor Fusion Experiences page. Below you can watch the video showcasing the sensor fusion techniques.</p>
-    <div style="max-width: 800px; margin: 20px auto; padding: 0 20px;">
-        <h2>Sensor Details</h2>
-        <ul>
-            <li><strong>RGB:</strong> - RGB camera: 15 Hz (15 fps)</li>
-            <li><strong>LIDAR:</strong> - Velodyne LiDAR: 10Hz</li>
-            <li><strong>GPS/IMU:</strong> OXTS GPS navigation system: 100Hz</li>
-            
-            <li><strong>Fusion:</strong> Combined sensor data for robust object detection and tracking.
-            <br>The main steps are summarized as:
-            <p> - Calibrate sensors to establish coordinate system relationships </p>
-            <p> - Detect objects in the camera images (Detection) </p>
-            <p> - Project 3D LiDAR point clouds to 2D Image space (Fusion) </p>
-            <p> - Associate LiDAR depth with each Detected object (Association to get Depth) </p>
 
-            Detection in 3D as opposed to 2D is much more useful to an autonomous vehicle since 3D detection allows 
-            the system know where objects are physically located in the world.</li>
-            
-            
-        </ul>
-    </div>
-    <h1>Kitti sensor fusion experiences</h1>
+<section class="content-section">
+    <h2>Sensor Details</h2>
+    <ul>
+        <li><strong>RGB Camera:</strong> 15 Hz (15 fps) for visual data capture</li>
+        <li><strong>LiDAR:</strong> Velodyne LiDAR at 10Hz for 3D point cloud generation</li>
+        <li><strong>GPS/IMU:</strong> OXTS GPS navigation system at 100Hz for positioning</li>
+        <li><strong>Fusion Pipeline:</strong> Combined sensor data for robust object detection and tracking
+            <ul style="margin-top: 10px;">
+                <li>Calibrate sensors to establish coordinate system relationships</li>
+                <li>Detect objects in camera images (Detection)</li>
+                <li>Project 3D LiDAR point clouds to 2D image space (Fusion)</li>
+                <li>Associate LiDAR depth with each detected object (Depth Association)</li>
+            </ul>
+        </li>
+    </ul>
+    <p style="margin-top: 15px;"><strong>Why 3D Detection?</strong> Detection in 3D space is crucial for autonomous vehicles as it provides precise physical location of objects in the world, enabling better path planning and collision avoidance.</p>
+</section>
+
+<section class="content-section">
+    <h2>Demo Video</h2>
     <div class="video-container">
         <video controls>
             <source src="videos/lidar_frame_stack.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
-    <!-- Footer -->
-    <footer role="contentinfo">
+    </div>
+</section>
+</main>
+
+<footer role="contentinfo">
         <a href="index.html" class="back-link" aria-label="Return to portfolio homepage">← Back to Portfolio</a>
     </footer>
 </body>

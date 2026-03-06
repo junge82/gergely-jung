@@ -2,92 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Video Player</title>
-    <style>
-        body {
-            background: #181818;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 40px 0;
-        }
-        .video-container {
-            max-width: 800px;
-            width: 100%;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-            border-radius: 8px;
-            overflow: hidden;
-            background: #222;
-        }
-        video {
-            width: 100%;
-            height: auto;
-            display: block;
-            background: #000;
-        }
-        .back-button {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 12px 24px;
-            background: #2563eb;
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
-        }
-        .back-button:hover {
-            background: #1d4ed8;
-            transform: translateX(-5px);
-            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
-        }
-        .back-button:focus {
-            outline: 3px solid #2563eb;
-            outline-offset: 3px;
-        }
-
-        .back-link {
-            display: inline-block;
-            padding: 12px 24px;
-            background: #4a9eff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: 600;
-            transition: background 0.3s ease;
-        }
-
-        .back-link:hover {
-            background: #357abd;
-        }
-
-        .back-link:focus {
-            outline: 2px solid #4a9eff;
-            outline-offset: 2px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Projection using YOLOv5</title>
+    <link rel="stylesheet" href="portfolio-style.css">
 </head>
 <body>
     <a href="index.html" class="back-button" aria-label="Back to portfolio">← Back to Portfolio</a>
-    <h1>OpenCV Perspective Transformation</h1>
-        <!-- ipm_matrix = cv.getPerspectiveTransform(src_points, dst_points)
-                Ipm_matrix [3x3] describes how to map coordinates from the source points to the destination points
-                bev_img = cv.warpPerspective(image, ipm_matrix, output_size)
-                applies the calculated perspective transformation to the input image using the cv.warpPerspective() function -->
+    <header>
+        <h1>Video Projection using YOLOv5</h1>
+        <p class="subtitle">OpenCV Perspective Transformation with Object Detection</p>
+    </header>
+    
+    <main>
+        <section class="content-section">
+            <h2>OpenCV Perspective Transformation</h2>
+            <p>This project demonstrates perspective transformation techniques using OpenCV combined with YOLOv5 object detection for video analysis.</p>
+            <div class="code-block">
+                <code>
+# Perspective transformation matrix<br>
+ipm_matrix = cv.getPerspectiveTransform(src_points, dst_points)<br>
+# IPM matrix [3x3] describes coordinate mapping from source to destination<br>
+bev_img = cv.warpPerspective(image, ipm_matrix, output_size)<br>
+# Applies the transformation to create bird's eye view
+                </code>
+            </div>
+        </section>
         
-
-    <h1>Video Player</h1>
-    <div class="video-container">
-        <video controls>
-            <source src="videos/swiss.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-    </div>
-    <!-- Footer -->
+        <section class="content-section">
+            <h2>Demo Video</h2>
+            <div class="video-container">
+                <video controls>
+                    <source src="videos/swiss.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </section>
+    </main>
+    
     <footer role="contentinfo">
         <a href="index.html" class="back-link" aria-label="Return to portfolio homepage">← Back to Portfolio</a>
     </footer>
