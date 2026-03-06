@@ -1,35 +1,66 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ResNet18 Fitness Classifier - GitHub Pages</title>
-        <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.18.0/dist/ort.min.js"></script>
-        <style>
-        * { box-sizing: border-box; }
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ResNet18 Fitness Classifier - Classify yoga, balance beam, and barbell exercises using ONNX">
+    <title>ResNet18 Fitness Classifier - GitHub Pages</title>
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.18.0/dist/ort.min.js"></script>
+    <style>
+        /* CSS Variables for maintainability */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #ff9a9e, #fecfef);
+            --button-gradient: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            --prediction-gradient: linear-gradient(135deg, #a8edea, #fed6e3);
+            --border-color: #4ecdc4;
+            --border-hover: #45b7d1;
+            --border-drag: #ff6b6b;
+            --success-bg: #d4edda;
+            --success-text: #155724;
+            --error-bg: #f8d7da;
+            --error-text: #721c24;
+            --info-bg: #d1ecf1;
+            --info-text: #0c5460;
+            --shadow-sm: 0 10px 25px rgba(0,0,0,0.1);
+            --shadow-md: 0 15px 35px rgba(0,0,0,0.2);
+            --shadow-lg: 0 20px 40px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             min-height: 100vh;
         }
+
         .container {
             background: white;
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-lg);
         }
+
         h1 {
             text-align: center;
             color: #333;
             margin-bottom: 10px;
             font-size: 2.5em;
+            line-height: 1.2;
         }
+
         .classes {
             text-align: center;
-            background: linear-gradient(135deg, #ff9a9e, #fecfef);
+            background: var(--secondary-gradient);
             padding: 15px;
             border-radius: 15px;
             margin-bottom: 30px;
@@ -38,38 +69,56 @@
         }
         
         .upload-area {
-            border: 3px dashed #4ecdc4;
+            border: 3px dashed var(--border-color);
             border-radius: 15px;
             padding: 50px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             margin-bottom: 30px;
             background: #f8f9fa;
+            position: relative;
         }
+
         .upload-area:hover { 
-            border-color: #45b7d1; 
+            border-color: var(--border-hover); 
             background: #e8f4f8;
             transform: translateY(-5px);
         }
+
+        .upload-area:focus-within {
+            outline: 3px solid var(--border-hover);
+            outline-offset: 2px;
+        }
+
         .upload-area.dragover { 
-            border-color: #ff6b6b; 
+            border-color: var(--border-drag); 
             background: #fff5f5;
             transform: scale(1.02);
         }
-        .upload-icon { font-size: 60px; margin-bottom: 20px; }
+
+        .upload-area.loaded {
+            border-color: var(--success-text);
+            background: var(--success-bg);
+        }
+
+        .upload-icon { 
+            font-size: 60px; 
+            margin-bottom: 20px;
+            user-select: none;
+        }
         
         #preview { 
             max-width: 100%; 
             max-height: 500px; 
             border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            box-shadow: var(--shadow-md);
             display: none;
             margin: 30px auto;
         }
         
         #classifyBtn {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            background: var(--button-gradient);
             color: white;
             border: none;
             padding: 20px 50px;
@@ -78,14 +127,22 @@
             font-weight: 700;
             cursor: pointer;
             width: 100%;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-top: 20px;
         }
+
         #classifyBtn:hover:not(:disabled) { 
             transform: translateY(-3px); 
             box-shadow: 0 15px 30px rgba(255,107,107,0.4);
         }
+
+        #classifyBtn:focus {
+            outline: 3px solid #ff6b6b;
+            outline-offset: 3px;
+        }
+
         #classifyBtn:disabled { 
             opacity: 0.5; 
             cursor: not-allowed; 
@@ -98,42 +155,66 @@
             margin: 30px 0;
             font-size: 1.2em;
             color: #ff6b6b;
+            animation: pulse 1.5s ease-in-out infinite;
         }
+
         .spinner.active { display: block; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
         
         #results {
             margin-top: 40px;
         }
+
         .prediction {
-            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            background: var(--prediction-gradient);
             padding: 25px;
             margin: 15px 0;
             border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-sm);
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 1.3em;
-            transition: all 0.3s ease;
+            transition: var(--transition);
+            animation: slideIn 0.3s ease-out;
         }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .prediction:hover {
             transform: translateY(-5px);
             box-shadow: 0 20px 40px rgba(0,0,0,0.15);
         }
+
         .pred-label { 
             font-weight: 700; 
             font-size: 1.5em;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
         .pred-confidence { 
             font-size: 2em; 
             font-weight: bold; 
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: var(--primary-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
         .status { 
             padding: 20px; 
             border-radius: 15px; 
@@ -141,235 +222,618 @@
             font-weight: 600;
             text-align: center;
             font-size: 1.1em;
+            animation: fadeIn 0.3s ease-in;
         }
-        .status.success { background: #d4edda; color: #155724; }
-        .status.error { background: #f8d7da; color: #721c24; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .status.success { background: var(--success-bg); color: var(--success-text); }
+        .status.error { background: var(--error-bg); color: var(--error-text); }
+        .status.info { background: var(--info-bg); color: var(--info-text); }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 12px 24px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+        }
+
+        .back-button:hover {
+            background: #1d4ed8;
+            transform: translateX(-5px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .back-button:focus {
+            outline: 3px solid #2563eb;
+            outline-offset: 3px;
+        }
         
         @media (max-width: 768px) {
             .container { padding: 20px; }
             h1 { font-size: 2em; }
+            .upload-area { padding: 30px; }
+            .pred-label { font-size: 1.2em; }
+            .pred-confidence { font-size: 1.5em; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        .back-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #4a9eff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: #357abd;
+        }
+
+        .back-link:focus {
+            outline: 2px solid #4a9eff;
+            outline-offset: 2px;
         }
     </style>
 </head>
 <body>
+    <a href="../index.html" class="back-button" aria-label="Back to portfolio">← Back to Portfolio</a>
     <div class="container">
         <h1>🏋️ ResNet18 Fitness Classifier</h1>
-        <div class="classes">🧘 yoga | 🤸 balance_beam | 🏋️ barbell</div>
+        <div class="classes" role="status" aria-live="polite">🧘 yoga | 🤸 balance_beam | 🏋️ barbell</div>
         
-        <div class="upload-area" id="modelUpload">
-            <div class="upload-icon">🧠</div>
+        <div class="upload-area" id="modelUpload" role="button" tabindex="0" aria-label="Upload ONNX model file">
+            <div class="upload-icon" aria-hidden="true">🧠</div>
             <div><strong>Upload resnet18_finetuned.onnx</strong></div>
-            <div>Drop your trained model here</div>
-            <input type="file" id="modelInput" accept=".onnx" style="display: none;">
+            <div>Drop your trained model here or click to browse</div>
+            <input type="file" id="modelInput" accept=".onnx" class="visually-hidden" aria-label="Model file input">
         </div>
         
-        <div class="upload-area" id="imageUpload">
-            <div class="upload-icon">📸</div>
+        <div class="upload-area" id="imageUpload" role="button" tabindex="0" aria-label="Upload fitness image">
+            <div class="upload-icon" aria-hidden="true">📸</div>
             <div><strong>Upload Fitness Image</strong></div>
             <div>JPG/PNG of yoga, balance beam, or barbell</div>
-            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+            <input type="file" id="imageInput" accept="image/*" class="visually-hidden" aria-label="Image file input">
         </div>
         
-        <img id="preview" />
-        <div id="status"></div>
+        <img id="preview" alt="Preview of uploaded image" />
+        <div id="status" role="alert" aria-live="polite"></div>
         
-        <button id="classifyBtn" disabled>🔍 CLASSIFY IMAGE</button>
+        <button id="classifyBtn" disabled aria-label="Classify uploaded image">🔍 CLASSIFY IMAGE</button>
         
-        <div class="spinner" id="spinner">
+        <div class="spinner" id="spinner" role="status" aria-live="polite">
             <div>⚡ Running ResNet18 inference...</div>
         </div>
         
-        <div id="results"></div>
+        <div id="results" role="region" aria-label="Classification results"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.18.0/dist/ort.min.js"></script>
     <script>
-        // Your 3 fitness classes
-        const FITNESS_CLASSES = ['balance_beam', 'barbell', 'yoga'];
+        'use strict';
+
+        // Configuration constants
+        const CONFIG = {
+            FITNESS_CLASSES: ['balance_beam', 'barbell', 'yoga'],
+            IMAGE_SIZE: 224,
+            IMAGENET_MEAN: [0.485, 0.456, 0.406],
+            IMAGENET_STD: [0.229, 0.224, 0.225],
+            MAX_FILE_SIZE: 100 * 1024 * 1024, // 100MB
+            MAX_IMAGE_SIZE: 10 * 1024 * 1024, // 10MB
+            SUPPORTED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
+            EXECUTION_PROVIDERS: ['wasm', 'webgl'],
+        };
+
+        // Utility functions
+        const Utils = {
+            /**
+             * Validate file size
+             */
+            validateFileSize(file, maxSize) {
+                if (file.size > maxSize) {
+                    throw new Error(`File size (${(file.size / 1024 / 1024).toFixed(1)}MB) exceeds maximum allowed size (${(maxSize / 1024 / 1024).toFixed(1)}MB)`);
+                }
+            },
+
+            /**
+             * Validate image type
+             */
+            validateImageType(file) {
+                if (!CONFIG.SUPPORTED_IMAGE_TYPES.includes(file.type)) {
+                    throw new Error(`Unsupported image type: ${file.type}. Supported types: ${CONFIG.SUPPORTED_IMAGE_TYPES.join(', ')}`);
+                }
+            },
+
+            /**
+             * Apply softmax to convert logits to probabilities
+             */
+            softmax(logits) {
+                const maxLogit = Math.max(...logits);
+                const expScores = logits.map(x => Math.exp(x - maxLogit));
+                const sumExpScores = expScores.reduce((a, b) => a + b, 0);
+                return expScores.map(x => x / sumExpScores);
+            },
+
+            /**
+             * Sanitize HTML to prevent XSS
+             */
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            },
+
+            /**
+             * Format bytes to human readable string
+             */
+            formatBytes(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+            }
+        };
 
         class ResNet18FitnessClassifier {
             constructor() {
                 this.session = null;
                 this.imageData = null;
-                this.inputName = 'input';  // Common ResNet input name
-                this.outputName = 'output'; // Common ResNet output name
+                this.inputName = 'input';
+                this.outputName = 'output';
+                this.isProcessing = false;
+                
                 this.initElements();
                 this.bindEvents();
+                this.setupAccessibility();
             }
 
+            /**
+             * Initialize DOM element references
+             */
             initElements() {
-                this.modelUpload = document.getElementById('modelUpload');
-                this.imageUpload = document.getElementById('imageUpload');
-                this.modelInput = document.getElementById('modelInput');
-                this.imageInput = document.getElementById('imageInput');
-                this.preview = document.getElementById('preview');
-                this.classifyBtn = document.getElementById('classifyBtn');
-                this.spinner = document.getElementById('spinner');
-                this.status = document.getElementById('status');
-                this.results = document.getElementById('results');
+                this.elements = {
+                    modelUpload: document.getElementById('modelUpload'),
+                    imageUpload: document.getElementById('imageUpload'),
+                    modelInput: document.getElementById('modelInput'),
+                    imageInput: document.getElementById('imageInput'),
+                    preview: document.getElementById('preview'),
+                    classifyBtn: document.getElementById('classifyBtn'),
+                    spinner: document.getElementById('spinner'),
+                    status: document.getElementById('status'),
+                    results: document.getElementById('results')
+                };
+
+                // Validate all elements exist
+                Object.entries(this.elements).forEach(([key, element]) => {
+                    if (!element) {
+                        console.error(`Element not found: ${key}`);
+                    }
+                });
             }
 
+            /**
+             * Bind event listeners
+             */
             bindEvents() {
-                // Model upload
-                this.modelUpload.addEventListener('click', () => this.modelInput.click());
-                this.modelInput.addEventListener('change', (e) => this.loadModel(e.target.files[0]));
+                const { modelUpload, imageUpload, modelInput, imageInput, classifyBtn } = this.elements;
+
+                // Model upload events
+                modelUpload.addEventListener('click', () => modelInput.click());
+                modelInput.addEventListener('change', (e) => this.handleModelUpload(e.target.files[0]));
                 
-                // Image upload
-                this.imageUpload.addEventListener('click', () => this.imageInput.click());
-                this.imageInput.addEventListener('change', (e) => this.handleImage(e.target.files[0]));
+                // Image upload events
+                imageUpload.addEventListener('click', () => imageInput.click());
+                imageInput.addEventListener('change', (e) => this.handleImageUpload(e.target.files[0]));
                 
                 // Drag & drop for both areas
-                [this.modelUpload, this.imageUpload].forEach(area => {
-                    area.addEventListener('dragover', this.handleDragOver);
-                    area.addEventListener('dragenter', this.handleDragOver);
-                    area.addEventListener('dragleave', this.handleDragLeave);
+                [modelUpload, imageUpload].forEach(area => {
+                    area.addEventListener('dragover', this.handleDragOver.bind(this));
+                    area.addEventListener('dragenter', this.handleDragOver.bind(this));
+                    area.addEventListener('dragleave', this.handleDragLeave.bind(this));
                     area.addEventListener('drop', (e) => this.handleDrop(e, area));
                 });
                 
-                this.classifyBtn.addEventListener('click', () => this.classify());
+                // Classify button
+                classifyBtn.addEventListener('click', () => this.classify());
+
+                // Keyboard navigation
+                modelUpload.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        modelInput.click();
+                    }
+                });
+
+                imageUpload.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        imageInput.click();
+                    }
+                });
             }
 
+            /**
+             * Setup accessibility features
+             */
+            setupAccessibility() {
+                // Add ARIA labels dynamically if needed
+                this.elements.classifyBtn.setAttribute('aria-busy', 'false');
+            }
+
+            /**
+             * Handle drag over event
+             */
             handleDragOver(e) {
                 e.preventDefault();
+                e.stopPropagation();
                 e.currentTarget.classList.add('dragover');
             }
 
+            /**
+             * Handle drag leave event
+             */
             handleDragLeave(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 e.currentTarget.classList.remove('dragover');
             }
 
+            /**
+             * Handle file drop event
+             */
             handleDrop(e, area) {
                 e.preventDefault();
+                e.stopPropagation();
                 e.currentTarget.classList.remove('dragover');
-                const file = e.dataTransfer.files[0];
-                if (file) {
-                    if (file.name === 'resnet18_finetuned.onnx' || file.name.endsWith('.onnx')) {
-                        this.loadModel(file);
+                
+                const file = e.dataTransfer?.files[0];
+                if (!file) return;
+
+                try {
+                    if (file.name.endsWith('.onnx')) {
+                        this.handleModelUpload(file);
                     } else if (file.type.startsWith('image/')) {
-                        this.handleImage(file);
+                        this.handleImageUpload(file);
+                    } else {
+                        this.showStatus('❌ Unsupported file type. Please upload an ONNX model or image file.', 'error');
                     }
+                } catch (error) {
+                    this.showStatus(`❌ Error: ${error.message}`, 'error');
                 }
             }
 
-            async loadModel(file) {
-                this.showStatus('Loading ResNet18_finetuned model...', 'info');
-                this.spinner.classList.add('active');
+            /**
+             * Handle model file upload
+             */
+            async handleModelUpload(file) {
+                if (!file) return;
+
+                if (this.isProcessing) {
+                    this.showStatus('⚠️ Please wait for current operation to complete', 'info');
+                    return;
+                }
+
+                this.isProcessing = true;
+                this.showStatus('Loading ResNet18 model...', 'info');
+                this.elements.spinner.classList.add('active');
+                this.elements.classifyBtn.setAttribute('aria-busy', 'true');
                 
                 try {
+                    // Validate file
+                    Utils.validateFileSize(file, CONFIG.MAX_FILE_SIZE);
+                    
+                    if (!file.name.endsWith('.onnx')) {
+                        throw new Error('Invalid file type. Please upload an ONNX model file (.onnx)');
+                    }
+
+                    // Load model
                     const arrayBuffer = await file.arrayBuffer();
                     const modelData = new Uint8Array(arrayBuffer);
                     
+                    // Clean up previous session
+                    if (this.session) {
+                        await this.session.release();
+                        this.session = null;
+                    }
+
                     this.session = await ort.InferenceSession.create(modelData, {
-                        executionProviders: ['wasm']
+                        executionProviders: CONFIG.EXECUTION_PROVIDERS
                     });
                     
                     // Get actual input/output names from model
                     this.inputName = this.session.inputNames[0];
                     this.outputName = this.session.outputNames[0];
                     
-                    this.showStatus(`✅ ResNet18_finetuned loaded! (${(arrayBuffer.byteLength/1024/1024).toFixed(1)}MB)`, 'success');
-                    this.classifyBtn.disabled = !this.imageData;
+                    this.elements.modelUpload.classList.add('loaded');
+                    this.showStatus(
+                        `✅ Model loaded successfully! (${Utils.formatBytes(arrayBuffer.byteLength)})`,
+                        'success'
+                    );
+                    
+                    this.updateClassifyButton();
                     
                 } catch (error) {
+                    console.error('Model loading error:', error);
                     this.showStatus(`❌ Failed to load model: ${error.message}`, 'error');
+                    this.session = null;
                 } finally {
-                    this.spinner.classList.remove('active');
+                    this.isProcessing = false;
+                    this.elements.spinner.classList.remove('active');
+                    this.elements.classifyBtn.setAttribute('aria-busy', 'false');
                 }
             }
 
-            handleImage(file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        // Display preview
-                        this.preview.src = e.target.result;
-                        this.preview.style.display = 'block';
-                        
-                        // Preprocess for ResNet18 (224x224, normalized ImageNet stats)
-                        this.imageData = this.preprocessResNetImage(img);
-                        
-                        this.classifyBtn.disabled = !this.session;
-                        this.showStatus('✅ Image processed - Ready to classify!', 'success');
+            /**
+             * Handle image file upload
+             */
+            async handleImageUpload(file) {
+                if (!file) return;
+
+                if (this.isProcessing) {
+                    this.showStatus('⚠️ Please wait for current operation to complete', 'info');
+                    return;
+                }
+
+                try {
+                    // Validate file
+                    Utils.validateFileSize(file, CONFIG.MAX_IMAGE_SIZE);
+                    Utils.validateImageType(file);
+
+                    const reader = new FileReader();
+                    
+                    reader.onerror = () => {
+                        this.showStatus('❌ Failed to read image file', 'error');
                     };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
+
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        
+                        img.onerror = () => {
+                            this.showStatus('❌ Failed to load image. Please try a different file.', 'error');
+                        };
+
+                        img.onload = () => {
+                            try {
+                                // Display preview
+                                this.elements.preview.src = e.target.result;
+                                this.elements.preview.style.display = 'block';
+                                
+                                // Preprocess for ResNet18
+                                this.imageData = this.preprocessResNetImage(img);
+                                
+                                this.elements.imageUpload.classList.add('loaded');
+                                this.showStatus('✅ Image processed - Ready to classify!', 'success');
+                                this.updateClassifyButton();
+                            } catch (error) {
+                                console.error('Image processing error:', error);
+                                this.showStatus(`❌ Image processing failed: ${error.message}`, 'error');
+                            }
+                        };
+                        
+                        img.src = e.target.result;
+                    };
+                    
+                    reader.readAsDataURL(file);
+                    
+                } catch (error) {
+                    console.error('Image upload error:', error);
+                    this.showStatus(`❌ ${error.message}`, 'error');
+                }
             }
 
+            /**
+             * Preprocess image for ResNet18 inference
+             */
             preprocessResNetImage(img) {
-                // ResNet18 expects: [1, 3, 224, 224] with ImageNet normalization
+                const { IMAGE_SIZE, IMAGENET_MEAN, IMAGENET_STD } = CONFIG;
+                
+                // Create canvas for image processing
                 const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = canvas.height = 224;
+                const ctx = canvas.getContext('2d', { willReadFrequently: true });
                 
-                // Resize and center crop
-                ctx.drawImage(img, 0, 0, 224, 224);
-                const imageData = ctx.getImageData(0, 0, 224, 224);
+                if (!ctx) {
+                    throw new Error('Failed to get canvas context');
+                }
+
+                canvas.width = canvas.height = IMAGE_SIZE;
                 
-                // CHW format with ImageNet normalization [mean=[0.485,0.456,0.406], std=[0.229,0.224,0.225]]
-                const data = new Float32Array(3 * 224 * 224);
-                const MEANS = [0.485, 0.456, 0.406];
-                const STDS = [0.229, 0.224, 0.225];
+                // Calculate aspect ratio for center crop
+                const scale = Math.max(IMAGE_SIZE / img.width, IMAGE_SIZE / img.height);
+                const scaledWidth = img.width * scale;
+                const scaledHeight = img.height * scale;
+                const x = (IMAGE_SIZE - scaledWidth) / 2;
+                const y = (IMAGE_SIZE - scaledHeight) / 2;
+                
+                // Draw and resize image
+                ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+                const imageData = ctx.getImageData(0, 0, IMAGE_SIZE, IMAGE_SIZE);
+                
+                // Convert to CHW format with ImageNet normalization
+                const data = new Float32Array(3 * IMAGE_SIZE * IMAGE_SIZE);
+                const pixelCount = IMAGE_SIZE * IMAGE_SIZE;
                 
                 for (let i = 0; i < imageData.data.length; i += 4) {
-                    const x = (i / 4) | 0;
+                    const pixelIndex = (i / 4) | 0;
                     const r = imageData.data[i] / 255;
                     const g = imageData.data[i + 1] / 255;
                     const b = imageData.data[i + 2] / 255;
                     
-                    data[0 * 224 * 224 + x] = (r - MEANS[0]) / STDS[0];  // R
-                    data[1 * 224 * 224 + x] = (g - MEANS[1]) / STDS[1];  // G
-                    data[2 * 224 * 224 + x] = (b - MEANS[2]) / STDS[2];  // B
+                    // Normalize using ImageNet statistics
+                    data[pixelIndex] = (r - IMAGENET_MEAN[0]) / IMAGENET_STD[0];  // R channel
+                    data[pixelCount + pixelIndex] = (g - IMAGENET_MEAN[1]) / IMAGENET_STD[1];  // G channel
+                    data[2 * pixelCount + pixelIndex] = (b - IMAGENET_MEAN[2]) / IMAGENET_STD[2];  // B channel
                 }
+                
                 return data;
             }
 
+            /**
+             * Run classification inference
+             */
             async classify() {
-                if (!this.session || !this.imageData) return;
+                if (!this.session || !this.imageData || this.isProcessing) {
+                    return;
+                }
                 
-                this.classifyBtn.disabled = true;
-                this.spinner.classList.add('active');
-                this.results.innerHTML = '';
+                this.isProcessing = true;
+                this.elements.classifyBtn.disabled = true;
+                this.elements.classifyBtn.setAttribute('aria-busy', 'true');
+                this.elements.spinner.classList.add('active');
+                this.elements.results.innerHTML = '';
                 
                 try {
-                    const tensor = new ort.Tensor('float32', this.imageData, [1, 3, 224, 224]);
-                    const feeds = { [this.inputName]: tensor };
-                    const results = await this.session.run(feeds);
-                    const scores = results[this.outputName].data;
+                    // Create input tensor
+                    const tensor = new ort.Tensor(
+                        'float32',
+                        this.imageData,
+                        [1, 3, CONFIG.IMAGE_SIZE, CONFIG.IMAGE_SIZE]
+                    );
                     
-                    // Get predictions for 3 fitness classes
-                    const predictions = FITNESS_CLASSES.map((className, i) => ({
+                    const feeds = { [this.inputName]: tensor };
+                    
+                    // Run inference
+                    const startTime = performance.now();
+                    const results = await this.session.run(feeds);
+                    const inferenceTime = (performance.now() - startTime).toFixed(0);
+                    
+                    const logits = Array.from(results[this.outputName].data);
+                    
+                    // Apply softmax to get probabilities
+                    const probabilities = Utils.softmax(logits);
+                    
+                    // Create predictions array
+                    const predictions = CONFIG.FITNESS_CLASSES.map((className, i) => ({
                         label: className,
-                        confidence: Math.max(0, scores[i])  // Ensure non-negative
+                        confidence: probabilities[i]
                     })).sort((a, b) => b.confidence - a.confidence);
                     
-                    predictions.forEach((pred, i) => {
-                        const div = document.createElement('div');
-                        div.className = 'prediction';
-                        div.innerHTML = `
-                            <div class="pred-label">${pred.label.toUpperCase()}</div>
-                            <div class="pred-confidence">${(pred.confidence * 100).toFixed(1)}%</div>
-                        `;
-                        this.results.appendChild(div);
-                    });
+                    // Display results
+                    this.displayResults(predictions, inferenceTime);
                     
                 } catch (error) {
-                    this.showStatus(`❌ Classification error: ${error.message}`, 'error');
+                    console.error('Classification error:', error);
+                    this.showStatus(`❌ Classification failed: ${error.message}`, 'error');
                 } finally {
-                    this.classifyBtn.disabled = false;
-                    this.spinner.classList.remove('active');
+                    this.isProcessing = false;
+                    this.elements.classifyBtn.disabled = false;
+                    this.elements.classifyBtn.setAttribute('aria-busy', 'false');
+                    this.elements.spinner.classList.remove('active');
                 }
             }
 
-            showStatus(message, type) {
-                this.status.textContent = message;
-                this.status.className = `status ${type}`;
+            /**
+             * Display classification results
+             */
+            displayResults(predictions, inferenceTime) {
+                this.elements.results.innerHTML = '';
+                
+                // Add inference time info
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'status info';
+                infoDiv.textContent = `⚡ Inference completed in ${inferenceTime}ms`;
+                this.elements.results.appendChild(infoDiv);
+                
+                // Display predictions
+                predictions.forEach((pred, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'prediction';
+                    div.style.animationDelay = `${index * 0.1}s`;
+                    div.setAttribute('role', 'article');
+                    div.setAttribute('aria-label', `Prediction ${index + 1}: ${pred.label} with ${(pred.confidence * 100).toFixed(1)}% confidence`);
+                    
+                    const labelDiv = document.createElement('div');
+                    labelDiv.className = 'pred-label';
+                    labelDiv.textContent = Utils.escapeHtml(pred.label.toUpperCase());
+                    
+                    const confidenceDiv = document.createElement('div');
+                    confidenceDiv.className = 'pred-confidence';
+                    confidenceDiv.textContent = `${(pred.confidence * 100).toFixed(1)}%`;
+                    
+                    div.appendChild(labelDiv);
+                    div.appendChild(confidenceDiv);
+                    this.elements.results.appendChild(div);
+                });
+            }
+
+            /**
+             * Update classify button state
+             */
+            updateClassifyButton() {
+                this.elements.classifyBtn.disabled = !(this.session && this.imageData && !this.isProcessing);
+            }
+
+            /**
+             * Show status message
+             */
+            showStatus(message, type = 'info') {
+                this.elements.status.textContent = message;
+                this.elements.status.className = `status ${type}`;
+            }
+
+            /**
+             * Cleanup resources
+             */
+            async cleanup() {
+                if (this.session) {
+                    await this.session.release();
+                    this.session = null;
+                }
+                this.imageData = null;
             }
         }
 
-        // Start the classifier
-        new ResNet18FitnessClassifier();
+        // Initialize classifier when DOM is ready
+        let classifier;
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                classifier = new ResNet18FitnessClassifier();
+            });
+        } else {
+            classifier = new ResNet18FitnessClassifier();
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (classifier) {
+                classifier.cleanup();
+            }
+        });
     </script>
+    <!-- Footer -->
+    <footer role="contentinfo">
+        <a href="./../index.html" class="back-link" aria-label="Return to portfolio homepage">← Back to Portfolio</a>
+    </footer>
 </body>
 </html>

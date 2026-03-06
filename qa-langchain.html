@@ -263,9 +263,34 @@
                 transition-duration: 0.01ms !important;
             }
         }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 12px 24px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+        }
+
+        .back-button:hover {
+            background: #1d4ed8;
+            transform: translateX(-5px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .back-button:focus {
+            outline: 3px solid #2563eb;
+            outline-offset: 3px;
+        }
     </style>
 </head>
 <body>
+    <a href="index.html" class="back-button" aria-label="Back to portfolio">← Back to Portfolio</a>
     <!-- Project Overview Section -->
     <header role="banner">
         <h1>QA Bot with LangChain</h1>

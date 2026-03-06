@@ -28,6 +28,27 @@
             display: block;
             background: #000;
         }
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 12px 24px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+        }
+        .back-button:hover {
+            background: #1d4ed8;
+            transform: translateX(-5px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
+        }
+        .back-button:focus {
+            outline: 3px solid #2563eb;
+            outline-offset: 3px;
+        }
         .fusion-explanation {
             max-width: 800px;
             margin: 20px auto;
@@ -102,8 +123,29 @@
                 padding: 15px;
             }
         }
-        </style>
+        .back-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #4a9eff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: #357abd;
+        }
+
+        .back-link:focus {
+            outline: 2px solid #4a9eff;
+            outline-offset: 2px;
+        }
+    </style>
 </head>
+<body>
+    <a href="index.html" class="back-button" aria-label="Back to portfolio">← Back to Portfolio</a>
 <section class="fusion-explanation" aria-labelledby="fusion-heading">
     <h2 id="fusion-heading">Sensor Fusion Approaches</h2>
     <div class="fusion-types">
@@ -168,5 +210,9 @@
             <source src="lidar_frame_stack.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
+    <!-- Footer -->
+    <footer role="contentinfo">
+        <a href="index.html" class="back-link" aria-label="Return to portfolio homepage">← Back to Portfolio</a>
+    </footer>
 </body>
 </html>

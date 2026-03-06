@@ -174,9 +174,54 @@
             outline: 2px solid #4a9eff;
             outline-offset: 2px;
         }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 12px 24px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+        }
+
+        .back-button:hover {
+            background: #1d4ed8;
+            transform: translateX(-5px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .back-button:focus {
+            outline: 3px solid #2563eb;
+            outline-offset: 3px;
+        }
+
+        .back-link {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #4a9eff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: #357abd;
+        }
+
+        .back-link:focus {
+            outline: 2px solid #4a9eff;
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body>
+    <a href="index.html" class="back-button" aria-label="Back to portfolio">← Back to Portfolio</a>
     <!-- Project Overview Section -->
     <header role="banner">
         <h1>ResNet18 Transfer Learning for Custom Image Classification</h1>
@@ -219,28 +264,13 @@
             <p class="result-summary">
                 High per-class accuracy with strong precision-recall trade-offs. Model ready for production deployment.
             </p>
-        </section>
-
-        <!-- Transfer Learning Phases Section -->
-        <section class="content-section" aria-labelledby="phases-heading">
-            <h2 id="phases-heading">Transfer Learning Phases</h2>
-            <ul class="phases-list">
-                <li><strong>Phase 1:</strong> Evaluate ResNet-18 pretrained model on test images</li>
-                <li><strong>Phase 2:</strong> Fine-tune base model for specific task on custom dataset</li>
-                <li><strong>Data Augmentation:</strong> Applied to training dataset for improved generalization</li>
-                <li><strong>Base Model:</strong> ResNet-18 pretrained on ImageNet (1000 classes)</li>
-                <li><strong>Custom Dataset:</strong> 3 classes with 1 new class (Source: image.cv)</li>
-                <li><strong>Architecture:</strong> Frozen ResNet-18 layers except final fully connected layer</li>
-                <li><strong>Training:</strong> Fine-tuned FC layer with validation step</li>
-                <li><strong>Framework:</strong> PyTorch Lightning with early stopping and checkpoint saving</li>
-                <li><strong>Evaluation Metrics:</strong> Confusion matrix and classification report</li>
-            </ul>
-        </section>
+        </section>                
     </main>
 
     <!-- Footer -->
     <footer role="contentinfo">
         <p class="file-path" aria-label="File location">Path: transfer-learning-sport-classes.html</p>
+        <a href="index.html" class="back-link" aria-label="Return to portfolio homepage">← Back to Portfolio</a>
     </footer>
 </body>
 </html>
