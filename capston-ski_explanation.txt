@@ -1,0 +1,121 @@
+    <h1>OpenCV Perspective Transformation</h1>
+    
+    <div class="code-section">
+        <h2>Implementation Overview</h2>
+        <p>This implementation demonstrates Inverse Perspective Mapping (IPM) for converting road images to bird's-eye view (BEV).</p>
+        
+        <h3>1. Calculate Perspective Transformation Matrix</h3>
+        <pre><code class="python"># Compute the 3x3 perspective transformation matrix
+# Maps coordinates from source points to destination points
+try:
+    ipm_matrix = cv.getPerspectiveTransform(src_points, dst_points)
+except cv.error as e:
+    raise ValueError(f"Invalid point configuration: {e}")
+</code></pre>
+        
+        <h3>2. Apply Perspective Transformation</h3>
+        <pre><code class="python"># Apply the transformation to convert to bird's-eye view
+# Uses bilinear interpolation by default for smooth results
+bev_img = cv.warpPerspective(
+    image,
+    ipm_matrix,
+    output_size,
+    flags=cv.INTER_LINEAR,
+    borderMode=cv.BORDER_CONSTANT,
+    borderValue=0
+)
+</code></pre>
+        
+        <h3>Best Practices & Optimizations</h3>
+        <div class="best-practices">
+            <h4>✓ Input Validation</h4>
+            <pre><code class="python">def validate_points(src_points, dst_points):
+    """Validate input points for perspective transformation."""
+    if src_points.shape != (4, 2) or dst_points.shape != (4, 2):
+        raise ValueError("Both point arrays must have shape (4, 2)")
+    
+    if src_points.dtype != np.float32:
+        src_points = src_points.astype(np.float32)
+    if dst_points.dtype != np.float32:
+        dst_points = dst_points.astype(np.float32)
+    
+    return src_points, dst_points
+</code></pre>
+            
+            <h4>✓ Performance Optimization</h4>
+            <pre><code class="python"># Cache the transformation matrix if processing multiple frames
+class PerspectiveTransformer:
+    def __init__(self, src_points, dst_points, output_size):
+        """Initialize with cached transformation matrix."""
+        self.src_points, self.dst_points = validate_points(src_points, dst_points)
+        self.output_size = output_size
+        self.ipm_matrix = cv.getPerspectiveTransform(
+            self.src_points,
+            self.dst_points
+        )
+    
+    def transform(self, image):
+        """Apply cached transformation - much faster for video streams."""
+        if image is None or image.size == 0:
+            raise ValueError("Invalid input image")
+        
+        return cv.warpPerspective(
+            image,
+            self.ipm_matrix,
+            self.output_size,
+            flags=cv.INTER_LINEAR  # Faster than INTER_CUBIC
+        )
+</code></pre>
+            
+            <h4>✓ Error Handling</h4>
+            <pre><code class="python">def safe_perspective_transform(image, src_points, dst_points, output_size):
+    """Robust perspective transformation with comprehensive error handling."""
+    try:
+        # Validate inputs
+        if image is None or image.size == 0:
+            raise ValueError("Invalid input image")
+        
+        src_points, dst_points = validate_points(src_points, dst_points)
+        
+        # Check if points form a valid quadrilateral
+        if cv.contourArea(src_points) < 1.0:
+            raise ValueError("Source points must form a valid quadrilateral")
+        
+        # Compute transformation
+        ipm_matrix = cv.getPerspectiveTransform(src_points, dst_points)
+        
+        # Apply transformation
+        bev_img = cv.warpPerspective(
+            image,
+            ipm_matrix,
+            output_size,
+            flags=cv.INTER_LINEAR,
+            borderMode=cv.BORDER_CONSTANT,
+            borderValue=0
+        )
+        
+        return bev_img, ipm_matrix
+        
+    except cv.error as e:
+        raise RuntimeError(f"OpenCV error during transformation: {e}")
+    except Exception as e:
+        raise RuntimeError(f"Unexpected error: {e}")
+</code></pre>
+            
+            <h4>✓ Edge Cases</h4>
+            <ul>
+                <li><strong>Collinear points:</strong> Ensure source points are not collinear (would result in singular matrix)</li>
+                <li><strong>Point order:</strong> Maintain consistent clockwise/counter-clockwise ordering</li>
+                <li><strong>Output size:</strong> Validate output dimensions are positive integers</li>
+                <li><strong>Memory:</strong> For large images, consider downsampling before transformation</li>
+            </ul>
+        </div>
+        
+        <h3>Performance Tips</h3>
+        <ul>
+            <li><strong>Interpolation:</strong> Use <code>INTER_LINEAR</code> (default) for speed, <code>INTER_CUBIC</code> for quality</li>
+            <li><strong>Caching:</strong> Reuse transformation matrix for video processing (60-80% faster)</li>
+            <li><strong>GPU Acceleration:</strong> Use <code>cv.cuda.warpPerspective()</code> for real-time applications</li>
+            <li><strong>Batch Processing:</strong> Process multiple frames in parallel using multiprocessing</li>
+        </ul>
+    </div>
