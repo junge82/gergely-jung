@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D LiDAR–Camera Perception Pipeline</title>
+    <link rel="stylesheet" href="../portfolio-style.css">
+</head>
+<body>
+    <a href="../index.html" class="back-button" aria-label="Back to portfolio">← Back to Portfolio</a>
+    <header>
+        <h1>Key Projects &amp; Independent Engineering Work</h1>
+        <h2>3D LiDAR–Camera Perception Pipeline (Sensor Fusion Project)</h2>
+        <p class="subtitle">Developed a complete, end-to-end ROS 2 perception pipeline for KITTI data, taking inspiration from open-source references and heavily refactoring the architecture into a high-performance, custom solution.</p>
+    </header>
+
+    <main>
+        <section class="content-section">
+            <ul class="features-list">
+                <li><strong>3D Point Cloud Processing:</strong> Implemented LiDAR ground-plane segmentation using RANSAC, followed by spatial filtering and DBSCAN clustering with Open3D.</li>
+                <li><strong>LiDAR-Camera Sensor Fusion:</strong> Integrated YOLO-based 2D camera detections with 3D LiDAR clusters by projecting cluster centroids into image space and associating them with nearby detections.</li>
+                <li><strong>ROS 2 Architecture:</strong> Published class-labeled 3D detections and Bird’s-Eye-View (BEV) visualizations through dedicated ROS 2 topics.</li>
+                <li><strong>Codebase Ownership:</strong> Rebuilt and modernized the pipeline from scratch based on a conceptual Medium blueprint, resulting in a nearly entirely new, optimized codebase.</li>
+                <li><strong>Technologies:</strong> Python, ROS 2 Jazzy, Open3D, OpenCV, PyTorch, ONNX Runtime, CUDA, NumPy, and the KITTI dataset.</li>
+            </ul>
+        </section>
+
+        <section class="content-section">
+            <h2>Demo</h2>
+            <div class="video-container">
+                <img src="../videos/kimenet.gif" alt="Animated demo of the 3D LiDAR-camera perception pipeline">
+            </div>
+        </section>
+    </main>
+
+    <footer role="contentinfo">
+        <a href="../index.html" class="back-link" aria-label="Return to portfolio homepage">← Back to Portfolio</a>
+    </footer>
+</body>
+</html>

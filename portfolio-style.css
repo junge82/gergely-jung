@@ -206,6 +206,12 @@ video {
     background: #000;
 }
 
+.video-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
 /* Results Section */
 .results {
     background: linear-gradient(135deg, rgba(13, 71, 161, 0.3) 0%, rgba(26, 47, 74, 0.3) 100%);
