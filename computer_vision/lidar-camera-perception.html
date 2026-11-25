@@ -8,22 +8,35 @@
 </head>
 <body>
     <a href="../index.html" class="back-button" aria-label="Back to portfolio">← Back to Portfolio</a>
-    <header>
-        <h1>Key Projects &amp; Independent Engineering Work</h1>
-        <h2>3D LiDAR–Camera Perception Pipeline (Sensor Fusion Project)</h2>
-        <p class="subtitle">Developed a complete, end-to-end ROS 2 perception pipeline for KITTI data, taking inspiration from open-source references and heavily refactoring the architecture into a high-performance, custom solution.</p>
+    <header>        
+        <h2>3D LiDAR–Camera Perception Pipeline</h2>
+        <p class="subtitle">Architected and implemented a low-latency, end-to-end ROS 2 perception pipeline for real-time 3D object detection and spatial tracking on the KITTI dataset, combining classical geometric point-cloud processing with deep-learning-based 2D vision.</p>
     </header>
 
     <main>
         <section class="content-section">
             <ul class="features-list">
-                <li><strong>3D Point Cloud Processing:</strong> Implemented LiDAR ground-plane segmentation using RANSAC, followed by spatial filtering and DBSCAN clustering with Open3D.</li>
-                <li><strong>LiDAR-Camera Sensor Fusion:</strong> Integrated YOLO-based 2D camera detections with 3D LiDAR clusters by projecting cluster centroids into image space and associating them with nearby detections.</li>
-                <li><strong>ROS 2 Architecture:</strong> Published class-labeled 3D detections and Bird’s-Eye-View (BEV) visualizations through dedicated ROS 2 topics.</li>
-                <li><strong>Codebase Ownership:</strong> Rebuilt and modernized the pipeline from scratch based on a conceptual Medium blueprint, resulting in a nearly entirely new, optimized codebase.</li>
-                <li><strong>Technologies:</strong> Python, ROS 2 Jazzy, Open3D, OpenCV, PyTorch, ONNX Runtime, CUDA, NumPy, and the KITTI dataset.</li>
+                <li><strong>3D Point Cloud Segmentation & Clustering:</strong> Engineered a multi-stage LiDAR processing pipeline utilizing voxel downsampling, Region-of-Interest (ROI) cropping, RANSAC ground-plane removal, and density-based spatial clustering (DBSCAN) via Open3D.</li>
+                <li><strong>Multi-Sensor Extrinsic Calibration & Fusion:</strong> Implemented vectorized 3D-to-2D frustum projection using KITTI calibration matrices (Tr_velo_to_cam, R0_rect, P2) to associate 3D LiDAR cluster centroids with 2D YOLO bounding boxes in real time.</li>
+                <li><strong>High-Throughput ROS 2 Architecture:</strong> Designed modular ROS 2 Jazzy nodes publishing synchronized 3D bounding markers, class-labeled point clouds, and real-time Bird’s-Eye-View (BEV) occupancy maps.</li>
+                <li><strong>Hardware-Accelerated Inference:</strong> Integrated CUDA-backed PyTorch and ONNX Runtime execution paths for deterministic, low-latency inference.</li>
+                <li><strong>Tech Stack:</strong> Python, ROS 2 Jazzy, Open3D, PyTorch, ONNX Runtime, CUDA, OpenCV, NumPy, KITTI Dataset.</li>
             </ul>
         </section>
+
+        <section>
+        <h2>Performance &amp; Benchmarking</h2>
+        <p>Profiled across 3 consecutive automated evaluation runs on KITTI sync bags at native 10 Hz playback (Intel Core i5-12400, NVIDIA RTX 4060):</p>
+
+        <ul>
+            <li><strong>LiDAR Processing (Open3D GPU CUDA RANSAC &amp; DBSCAN):</strong> 31.45 ms median callback (&lt; 100 ms budget; CUDA DBSCAN: 20.25 ms).</li>
+            <li><strong>Camera Inference (ONNX Runtime CUDA, YOLOv8n 1248&times;384):</strong> 4.89 ms pure inference (11.31 ms total callback including NCHW preprocessing &amp; NMS).</li>
+            <li><strong>Geometric Frustum Fusion (PyTorch CUDA Broadcasting):</strong> 2.67 ms compute interval (3.46 ms total synchronized callback).</li>
+            <li><strong>BEV Visualization:</strong> 2.78 ms asynchronous render callback (&lt; 20 ms budget).</li>
+            <li><strong>Resource Footprint:</strong> ~1.44 GB peak VRAM at ~10% mean / ~15% peak GPU utilization.</li>
+        </ul>
+        </section>
+
 
         <section class="content-section">
             <h2>Demo</h2>
